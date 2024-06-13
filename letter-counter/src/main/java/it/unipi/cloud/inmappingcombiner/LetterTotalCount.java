@@ -1,4 +1,4 @@
-package it.unipi.cloud.inMapping;
+package it.unipi.cloud.inmappingcombiner;
 
 import java.io.IOException;
 
@@ -8,6 +8,8 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.io.Text;
+
+//fai una hashmap con le lettere e il loro conteggio
 
 public class LetterTotalCount {
 

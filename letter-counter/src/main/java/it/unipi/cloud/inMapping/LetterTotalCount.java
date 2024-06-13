@@ -1,4 +1,4 @@
-package it.unipi.cloud.combiner;
+package it.unipi.cloud.inMapping;
 
 import java.io.IOException;
 
@@ -11,32 +11,32 @@ import org.apache.hadoop.io.Text;
 
 public class LetterTotalCount {
 
-    private final static IntWritable one = new IntWritable(1);
+    private final static LongWritable one = new LongWritable(1);
     private Text word = new Text("total");
 
-    public static class CounterMapper extends Mapper<Object, Text, NullWritable, LongWritable> 
+    public static class CounterMapper extends Mapper<Object, Text, Text, LongWritable> 
     {
         @Override
-        public void map(Object key, Text value, Mapper<Object, Text, NullWritable, LongWritable>.Context context) throws IOException, InterruptedException {
+        public void map(Object key, Text value, Mapper<Object, Text, Text, LongWritable>.Context context) throws IOException, InterruptedException {
             String line = value.toString();
             String[] words = line.split("\\s+");
             for (String str : words) {
                 if (!str.isEmpty()) {
-                    context.write(word, one);
+                    context.write(new Text("total"), one);
                 }
             }
         }
     }
 
-    public static class CounterReducer extends Reducer<NullWritable, LongWritable, NullWritable, LongWritable> 
+    public static class CounterReducer extends Reducer<Text, LongWritable, NullWritable, LongWritable> 
     {
         @Override
-        public void reduce(NullWritable key, Iterable<LongWritable> values, Reducer<NullWritable, LongWritable, NullWritable, LongWritable>.Context context) throws IOException, InterruptedException {
+        public void reduce(Text key, Iterable<LongWritable> values, Reducer<Text, LongWritable, NullWritable, LongWritable>.Context context) throws IOException, InterruptedException {
             long sum = 0;
             for (LongWritable val : values) {
                 sum += val.get();
             }
-            context.write(key, new LongWritable(sum));
+            context.write(NullWritable.get(), new LongWritable(sum));
         }
     }   
 }

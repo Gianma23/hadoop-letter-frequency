@@ -1,5 +1,15 @@
 package it.unipi.cloud.combiner;
 
-public class LetterTotalCount {
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.io.Text;
 
+public class LetterTotalCount {
+    public static class CounterMapper extends Mapper<Object, Text, NullWritable, LongWritable> 
+    {}
+
+    public static class CounterReducer extends Reducer<NullWritable, LongWritable, NullWritable, LongWritable> 
+    {}
 }

@@ -1,6 +1,7 @@
 package it.unipi.cloud.inmappingcombiner;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -9,36 +10,50 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.io.Text;
 
-//fai una hashmap con le lettere e il loro conteggio
-
 public class LetterTotalCount {
 
-    private final static LongWritable one = new LongWritable(1);
-    private Text word = new Text("total");
+    private final static IntWritable one = new IntWritable(1);
+    private final static Text word = new Text("total");
 
-    public static class CounterMapper extends Mapper<Object, Text, Text, LongWritable> 
+    public static class CounterMapper extends Mapper<Object, Text, Text, IntWritable> 
     {
+        private HashMap<String, Integer> letterCountMap;
+
         @Override
-        public void map(Object key, Text value, Mapper<Object, Text, Text, LongWritable>.Context context) throws IOException, InterruptedException {
+        protected void setup(Context context) throws IOException, InterruptedException {
+            letterCountMap = new HashMap<>();
+        }
+
+        @Override
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             String line = value.toString();
             String[] words = line.split("\\s+");
             for (String str : words) {
                 if (!str.isEmpty()) {
-                    context.write(new Text("total"), one);
+                    context.write(word, one);
                 }
+            }
+        }
+
+        @Override
+        protected void cleanup(Context context) throws IOException, InterruptedException {
+            for (String key : letterCountMap.keySet()) {
+                context.write(new Text(key), new IntWritable(letterCountMap.get(key)));
             }
         }
     }
 
-    public static class CounterReducer extends Reducer<Text, LongWritable, NullWritable, LongWritable> 
+    public static class CounterReducer extends Reducer<Text, LongWritable, Text, LongWritable> 
     {
+        private LongWritable result = new LongWritable();
         @Override
-        public void reduce(Text key, Iterable<LongWritable> values, Reducer<Text, LongWritable, NullWritable, LongWritable>.Context context) throws IOException, InterruptedException {
+        public void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
             long sum = 0;
             for (LongWritable val : values) {
                 sum += val.get();
             }
-            context.write(NullWritable.get(), new LongWritable(sum));
+            result.set(sum);
+            context.write(key, result);
         }
     }   
 }

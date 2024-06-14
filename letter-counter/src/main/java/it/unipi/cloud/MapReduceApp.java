@@ -15,6 +15,9 @@ import org.apache.hadoop.util.GenericOptionsParser;
 import it.unipi.cloud.combiner.LetterTotalCount;
 import it.unipi.cloud.combiner.LetterFrequency;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
@@ -41,8 +44,8 @@ public class MapReduceApp {
         countJob.setCombinerClass(LetterTotalCount.CounterReducer.class);
         countJob.setReducerClass(LetterTotalCount.CounterReducer.class);
         
-        countJob.setOutputKeyClass(org.apache.hadoop.io.Text.class);
-        countJob.setOutputValueClass(org.apache.hadoop.io.LongWritable.class);
+        countJob.setOutputKeyClass(Text.class);
+        countJob.setOutputValueClass(LongWritable.class);
 
         FileInputFormat.addInputPath(countJob, new Path(otherArgs[INPUT_INDEX]));
         FileOutputFormat.setOutputPath(countJob, new Path(otherArgs[OUTPUT_LETTERCOUNT_INDEX]));
@@ -64,8 +67,9 @@ public class MapReduceApp {
 
         freqJob.setNumReduceTasks(NUMBER_OF_REDUCERS);
 
-        countJob.setOutputKeyClass(org.apache.hadoop.io.Text.class);
-        countJob.setOutputValueClass(org.apache.hadoop.io.LongWritable.class);
+        freqJob.setMapOutputValueClass(LongWritable.class);
+        freqJob.setOutputKeyClass(Text.class);
+        freqJob.setOutputValueClass(DoubleWritable.class);
 
         FileInputFormat.addInputPath(freqJob, new Path(otherArgs[INPUT_INDEX]));
         FileOutputFormat.setOutputPath(freqJob, new Path(otherArgs[OUTPUT_LETTERFREQ_INDEX]));

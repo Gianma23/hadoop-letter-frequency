@@ -38,7 +38,7 @@ public class LetterTotalCount {
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
             for (String key : letterCountMap.keySet()) {
-                context.write(new Text(key), new IntWritable(letterCountMap.get(key)));
+                context.write(new Text(key), one);
             }
         }
     }

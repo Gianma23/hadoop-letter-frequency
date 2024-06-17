@@ -13,9 +13,7 @@ import java.util.Map;
 public class LetterFrequency {
     public static class CounterMapper extends Mapper<LongWritable, Text, Text, LongWritable> 
     {
-        private Text letter = new Text();
         private LongWritable one = new LongWritable(1);
-        private LongWritable newValue = new LongWritable();
         Map<Text, LongWritable> letterCount;
 
         public void setup(Context context) {
@@ -25,6 +23,8 @@ public class LetterFrequency {
         @Override
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
         {
+            Text letter = new Text();
+            LongWritable newValue = new LongWritable();
             String line = value.toString();
             for (char c : line.toCharArray()) {
                 if (Character.isLetter(c)) {
@@ -48,7 +48,6 @@ public class LetterFrequency {
 
     public static class CounterReducer extends Reducer<Text, LongWritable, Text, DoubleWritable> 
     {
-        private DoubleWritable result = new DoubleWritable();
         private long letterCount;
 
         public void setup(Context context) {
@@ -58,6 +57,7 @@ public class LetterFrequency {
         @Override
         public void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException
         {
+            DoubleWritable result = new DoubleWritable();
             long sum = 0;
             for (LongWritable val : values) {
                 sum += val.get();

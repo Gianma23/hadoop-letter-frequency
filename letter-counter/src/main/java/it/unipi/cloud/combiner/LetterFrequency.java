@@ -11,12 +11,12 @@ import org.apache.hadoop.io.Text;
 public class LetterFrequency {
     public static class CounterMapper extends Mapper<LongWritable, Text, Text, LongWritable> 
     {
-        private Text letter = new Text();
         private LongWritable one = new LongWritable(1);
 
         @Override
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
         {
+            Text letter = new Text();
             String line = value.toString();
             for (char c : line.toCharArray()) {
                 if (Character.isLetter(c)) {
@@ -27,9 +27,23 @@ public class LetterFrequency {
         }
     }
 
+    public static class CounterCombiner extends Reducer<Text, LongWritable, Text, LongWritable> 
+    {
+        @Override
+        public void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException
+        {
+            LongWritable result = new LongWritable();
+            long sum = 0;
+            for (LongWritable val : values) {
+                sum += val.get();
+            }
+            result.set(sum);
+            context.write(key, result);
+        }
+    }
+
     public static class CounterReducer extends Reducer<Text, LongWritable, Text, DoubleWritable> 
     {
-        private DoubleWritable result = new DoubleWritable();
         private long letterCount;
 
         public void setup(Context context) {
@@ -39,6 +53,7 @@ public class LetterFrequency {
         @Override
         public void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException
         {
+            DoubleWritable result = new DoubleWritable();
             long sum = 0;
             for (LongWritable val : values) {
                 sum += val.get();

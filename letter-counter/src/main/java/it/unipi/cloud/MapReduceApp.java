@@ -47,9 +47,10 @@ public class MapReduceApp {
         Job countJob = Job.getInstance(conf, "Total Letter Count");
         countJob.setJarByClass(Class.forName(method + ".LetterTotalCount"));
         countJob.setMapperClass((Class<Mapper>) Class.forName(method + ".LetterTotalCount$CounterMapper"));
-        countJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterTotalCount$CounterReducer"));
         countJob.setReducerClass((Class<Reducer>) Class.forName(method + ".LetterTotalCount$CounterReducer"));
-        
+        if(method.equals("it.unipi.cloud.combiner")) {
+            countJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterTotalCount$CounterReducer"));
+        }
         countJob.setOutputKeyClass(Text.class);
         countJob.setOutputValueClass(LongWritable.class);
 
@@ -68,8 +69,10 @@ public class MapReduceApp {
         
         freqJob.setJarByClass(Class.forName(method + ".LetterFrequency"));
         freqJob.setMapperClass((Class<Mapper>) Class.forName(method + ".LetterFrequency$CounterMapper"));
-        freqJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency$CounterReducer"));
         freqJob.setReducerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency$CounterReducer"));
+        if(method.equals("it.unipi.cloud.combiner")) {
+            freqJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency$CounterCombiner"));
+        }
 
         freqJob.setNumReduceTasks(nReducers);
 

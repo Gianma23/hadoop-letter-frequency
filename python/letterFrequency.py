@@ -17,5 +17,5 @@ def calculate_letter_frequency(file_path):
 
 # Example usage
 start_time = time.time()
-calculate_letter_frequency('../resources/python/test.txt')
+calculate_letter_frequency('../resources/historical_analysis/input/1294.txt')
 print(f"Execution time: {time.time() - start_time} seconds")

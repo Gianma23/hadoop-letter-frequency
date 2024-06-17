@@ -10,22 +10,20 @@ import org.apache.hadoop.io.Text;
 
 public class LetterTotalCount {
 
-    private final static IntWritable one = new IntWritable(1);
-    private final static Text word = new Text("total");
-
-
     public static class CounterMapper extends Mapper<Object, Text, Text, LongWritable> 
     {
+        private final static IntWritable one = new IntWritable(1);
+        private final static Text word = new Text("total");
+
         @Override
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-        String line = value.toString();
-        for (char c : line.toCharArray()) {
-            if (Character.isLetter(c)) {
-                    sumTotal++;
+            String line = value.toString();
+            for (char c : line.toCharArray()) {
+                if (Character.isLetter(c)) {
+                    context.write(c, one);
                 }
             }
-            letterCount.put(sumTotal, one);
-        }
+        }    
     }
 
     public static class CounterReducer extends Reducer<Text, LongWritable, Text, LongWritable> 
@@ -37,8 +35,8 @@ public class LetterTotalCount {
             for (LongWritable val : values) {
                 sum += val.get();
             }
-            result.set(sum);
-            context.write(key, result);
+            result.set(sum)
+            context.write(key, this.result);
         }
     }   
 }

@@ -11,41 +11,50 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.GenericOptionsParser;
 
-// TODO conditionally import the correct classes
-import it.unipi.cloud.combiner.LetterTotalCount;
-import it.unipi.cloud.combiner.LetterFrequency;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class MapReduceApp {
 
-    private static final int NUMBER_OF_REDUCERS = 3;
     private static final int INPUT_INDEX = 0;
     private static final int OUTPUT_LETTERCOUNT_INDEX = 1;
     private static final int OUTPUT_LETTERFREQ_INDEX = 2;
+    private static final int NUMBER_OF_REDUCERS_INDEX = 3;
+    private static final int METHOD_INDEX = 4;
 
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception{
         Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 
-        if(otherArgs.length != 3){
-            System.err.println("Usage: letterfrequency <input> <LetterTotalCountOutput> <LetterFrequencyOutput>");
+        if(otherArgs.length != 5){
+            System.err.println("Usage: letterfrequency <input> <letterTotalCountOutput> <letterFrequencyOutput> <nReducers> <method>");
             System.exit(2);
         }
+        String inputhPath = otherArgs[INPUT_INDEX];
+        String outputLetterCountPath = otherArgs[OUTPUT_LETTERCOUNT_INDEX]; 
+        String outputLetterFreqPath = otherArgs[OUTPUT_LETTERFREQ_INDEX];
+        int nReducers = Integer.parseInt(otherArgs[NUMBER_OF_REDUCERS_INDEX]);
+        String method = otherArgs[METHOD_INDEX];
 
         // Start the job to count the total number of letters
         Job countJob = Job.getInstance(conf, "Total Letter Count");
-        countJob.setJarByClass(LetterTotalCount.class);
-        countJob.setMapperClass(LetterTotalCount.CounterMapper.class);
-        countJob.setCombinerClass(LetterTotalCount.CounterReducer.class);
-        countJob.setReducerClass(LetterTotalCount.CounterReducer.class);
+        countJob.setJarByClass(Class.forName(method + ".LetterTotalCount"));
+        countJob.setMapperClass((Class<Mapper>) Class.forName(method + ".LetterTotalCount.CounterMapper"));
+        countJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterTotalCount.CounterReducer"));
+        countJob.setReducerClass((Class<Reducer>) Class.forName(method + ".LetterTotalCount.CounterReducer"));
         
-        countJob.setOutputKeyClass(org.apache.hadoop.io.Text.class);
-        countJob.setOutputValueClass(org.apache.hadoop.io.LongWritable.class);
+        countJob.setOutputKeyClass(Text.class);
+        countJob.setOutputValueClass(LongWritable.class);
 
-        FileInputFormat.addInputPath(countJob, new Path(otherArgs[INPUT_INDEX]));
-        FileOutputFormat.setOutputPath(countJob, new Path(otherArgs[OUTPUT_LETTERCOUNT_INDEX]));
+        FileInputFormat.addInputPath(countJob, new Path(inputhPath));
+        FileOutputFormat.setOutputPath(countJob, new Path(outputLetterCountPath));
 
         if(!countJob.waitForCompletion(true)){
             System.exit(1);
@@ -54,38 +63,35 @@ public class MapReduceApp {
         // Start the job to calculate the frequency of each letter
         Job freqJob = Job.getInstance(conf, "Letter Frequency");
         
-        long letterCount = getLetterCount(conf, otherArgs[OUTPUT_LETTERCOUNT_INDEX]);
+        long letterCount = getLetterCount(conf, outputLetterCountPath);
         freqJob.getConfiguration().setLong("letterCount", letterCount);
         
-        freqJob.setJarByClass(LetterFrequency.class);
-        freqJob.setMapperClass(LetterFrequency.CounterMapper.class);
-        freqJob.setCombinerClass(LetterFrequency.CounterReducer.class);
-        freqJob.setReducerClass(LetterFrequency.CounterReducer.class);
+        freqJob.setJarByClass(Class.forName(method + ".LetterFrequency"));
+        freqJob.setMapperClass((Class<Mapper>) Class.forName(method + ".LetterFrequency.CounterMapper"));
+        freqJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency.CounterReducer"));
+        freqJob.setReducerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency.CounterReducer"));
 
-        freqJob.setNumReduceTasks(NUMBER_OF_REDUCERS);
+        freqJob.setNumReduceTasks(nReducers);
 
-        countJob.setOutputKeyClass(org.apache.hadoop.io.Text.class);
-        countJob.setOutputValueClass(org.apache.hadoop.io.LongWritable.class);
+        freqJob.setMapOutputValueClass(LongWritable.class);
+        freqJob.setOutputKeyClass(Text.class);
+        freqJob.setOutputValueClass(DoubleWritable.class);
 
-        FileInputFormat.addInputPath(freqJob, new Path(otherArgs[INPUT_INDEX]));
-        FileOutputFormat.setOutputPath(freqJob, new Path(otherArgs[OUTPUT_LETTERFREQ_INDEX]));
+        FileInputFormat.addInputPath(freqJob, new Path(inputhPath));
+        FileOutputFormat.setOutputPath(freqJob, new Path(outputLetterFreqPath));
 
         System.exit(freqJob.waitForCompletion(true) ? 0 : 1);
     }
 
     private static long getLetterCount(Configuration conf, String outputDir) throws IOException {
-        // Read the output of the first job
         FileSystem fs = FileSystem.get(conf);
         Path outputPath = new Path(outputDir);
-
-        // Initialize the total text length
         long letterCount = 0;
 
         // Get a list of all files in the output directory
         FileStatus[] status = fs.listStatus(outputPath);
         for (FileStatus fileStatus : status) {
             String fileName = fileStatus.getPath().getName();
-
             // Ignore the _SUCCESS file
             if (fileName.equals("_SUCCESS")) {
                 continue;
@@ -93,18 +99,14 @@ public class MapReduceApp {
             // Open the file
             FSDataInputStream inputStream = fs.open(fileStatus.getPath());
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-
-            // The result is on the first line of the output
+            
             String firstLine = bufferedReader.readLine();
             if (firstLine != null) {
-                long textLength = Long.parseLong(firstLine);
-                letterCount += textLength;                    
+                letterCount += Long.parseLong(firstLine);                    
             }
-            
             // Close the input stream
             bufferedReader.close();
             inputStream.close();
-        
         }
         return letterCount;
     }

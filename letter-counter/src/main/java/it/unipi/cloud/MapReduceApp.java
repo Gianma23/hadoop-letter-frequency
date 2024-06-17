@@ -84,18 +84,14 @@ public class MapReduceApp {
     }
 
     private static long getLetterCount(Configuration conf, String outputDir) throws IOException {
-        // Read the output of the first job
         FileSystem fs = FileSystem.get(conf);
         Path outputPath = new Path(outputDir);
-
-        // Initialize the total text length
         long letterCount = 0;
 
         // Get a list of all files in the output directory
         FileStatus[] status = fs.listStatus(outputPath);
         for (FileStatus fileStatus : status) {
             String fileName = fileStatus.getPath().getName();
-
             // Ignore the _SUCCESS file
             if (fileName.equals("_SUCCESS")) {
                 continue;
@@ -103,18 +99,14 @@ public class MapReduceApp {
             // Open the file
             FSDataInputStream inputStream = fs.open(fileStatus.getPath());
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-
-            // The result is on the first line of the output
+            
             String firstLine = bufferedReader.readLine();
             if (firstLine != null) {
-                long textLength = Long.parseLong(firstLine);
-                letterCount += textLength;                    
+                letterCount += Long.parseLong(firstLine);                    
             }
-            
             // Close the input stream
             bufferedReader.close();
             inputStream.close();
-        
         }
         return letterCount;
     }

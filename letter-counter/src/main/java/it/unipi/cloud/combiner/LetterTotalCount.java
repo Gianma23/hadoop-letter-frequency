@@ -2,7 +2,6 @@ package it.unipi.cloud.combiner;
 
 import java.io.IOException;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -12,7 +11,7 @@ public class LetterTotalCount {
 
     public static class CounterMapper extends Mapper<Object, Text, Text, LongWritable> 
     {
-        private final static IntWritable one = new IntWritable(1);
+        private final static LongWritable one = new LongWritable(1);
         private final static Text word = new Text("total");
 
         @Override
@@ -20,7 +19,7 @@ public class LetterTotalCount {
             String line = value.toString();
             for (char c : line.toCharArray()) {
                 if (Character.isLetter(c)) {
-                    context.write(c, one);
+                    context.write(word, one);
                 }
             }
         }    
@@ -35,8 +34,8 @@ public class LetterTotalCount {
             for (LongWritable val : values) {
                 sum += val.get();
             }
-            result.set(sum)
-            context.write(key, this.result);
+            result.set(sum);
+            context.write(key, result);
         }
     }   
 }

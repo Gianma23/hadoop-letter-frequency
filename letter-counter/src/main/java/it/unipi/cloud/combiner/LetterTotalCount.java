@@ -14,17 +14,17 @@ public class LetterTotalCount {
     private final static Text word = new Text("total");
 
 
-    public static class CounterMapper extends Mapper<Object, Text, Text, IntWritable> 
+    public static class CounterMapper extends Mapper<Object, Text, Text, LongWritable> 
     {
         @Override
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            String line = value.toString();
-            String[] words = line.split("\\s+");
-            for (String str : words) {
-                if (!str.isEmpty()) {
-                    context.write(word, one);
+        String line = value.toString();
+        for (char c : line.toCharArray()) {
+            if (Character.isLetter(c)) {
+                    sumTotal++;
                 }
             }
+            letterCount.put(sumTotal, one);
         }
     }
 

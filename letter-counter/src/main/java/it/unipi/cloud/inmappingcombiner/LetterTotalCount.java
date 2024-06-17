@@ -41,13 +41,6 @@ public class LetterTotalCount {
                 context.write(entry.getKey(), sumTotal); //might insert directly one here
             }
         }
-
-        @Override
-        protected void cleanup(Context context) throws IOException, InterruptedException {
-            for (String key : letterCountMap.keySet()) {
-                context.write(new Text(key), one);
-            }
-        }
     }
 
     public static class CounterReducer extends Reducer<Text, LongWritable, Text, LongWritable> 

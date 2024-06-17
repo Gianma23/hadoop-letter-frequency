@@ -41,14 +41,14 @@ public class MapReduceApp {
         String outputLetterCountPath = otherArgs[OUTPUT_LETTERCOUNT_INDEX]; 
         String outputLetterFreqPath = otherArgs[OUTPUT_LETTERFREQ_INDEX];
         int nReducers = Integer.parseInt(otherArgs[NUMBER_OF_REDUCERS_INDEX]);
-        String method = otherArgs[METHOD_INDEX];
+        String method = "it.unipi.cloud." + otherArgs[METHOD_INDEX];
 
         // Start the job to count the total number of letters
         Job countJob = Job.getInstance(conf, "Total Letter Count");
         countJob.setJarByClass(Class.forName(method + ".LetterTotalCount"));
-        countJob.setMapperClass((Class<Mapper>) Class.forName(method + ".LetterTotalCount.CounterMapper"));
-        countJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterTotalCount.CounterReducer"));
-        countJob.setReducerClass((Class<Reducer>) Class.forName(method + ".LetterTotalCount.CounterReducer"));
+        countJob.setMapperClass((Class<Mapper>) Class.forName(method + ".LetterTotalCount$CounterMapper"));
+        countJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterTotalCount$CounterReducer"));
+        countJob.setReducerClass((Class<Reducer>) Class.forName(method + ".LetterTotalCount$CounterReducer"));
         
         countJob.setOutputKeyClass(Text.class);
         countJob.setOutputValueClass(LongWritable.class);
@@ -67,12 +67,13 @@ public class MapReduceApp {
         freqJob.getConfiguration().setLong("letterCount", letterCount);
         
         freqJob.setJarByClass(Class.forName(method + ".LetterFrequency"));
-        freqJob.setMapperClass((Class<Mapper>) Class.forName(method + ".LetterFrequency.CounterMapper"));
-        freqJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency.CounterReducer"));
-        freqJob.setReducerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency.CounterReducer"));
+        freqJob.setMapperClass((Class<Mapper>) Class.forName(method + ".LetterFrequency$CounterMapper"));
+        freqJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency$CounterReducer"));
+        freqJob.setReducerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency$CounterReducer"));
 
         freqJob.setNumReduceTasks(nReducers);
 
+        freqJob.setMapOutputKeyClass(Text.class);
         freqJob.setMapOutputValueClass(LongWritable.class);
         freqJob.setOutputKeyClass(Text.class);
         freqJob.setOutputValueClass(DoubleWritable.class);
@@ -102,6 +103,7 @@ public class MapReduceApp {
             
             String firstLine = bufferedReader.readLine();
             if (firstLine != null) {
+                firstLine = firstLine.split("\t")[1];
                 letterCount += Long.parseLong(firstLine);                    
             }
             // Close the input stream

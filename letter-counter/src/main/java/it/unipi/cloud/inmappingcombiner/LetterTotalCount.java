@@ -1,6 +1,7 @@
 package it.unipi.cloud.inmappingcombiner;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -9,14 +10,12 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.io.Text;
 
-//fai una hashmap con le lettere e il loro conteggio
-
 public class LetterTotalCount {
 
-    private final static LongWritable one = new LongWritable(1);
-    private Text word = new Text("total");
+    private final static IntWritable one = new IntWritable(1);
+    private final static Text word = new Text("total");
 
-    public static class CounterMapper extends Mapper<Object, Text, Text, LongWritable> 
+    public static class CounterMapper extends Mapper<Object, Text, Text, IntWritable> 
     {
 
         Map<Text, LongWritable> letterCount;
@@ -42,12 +41,20 @@ public class LetterTotalCount {
                 context.write(entry.getKey(), sumTotal); //might insert directly one here
             }
         }
+
+        @Override
+        protected void cleanup(Context context) throws IOException, InterruptedException {
+            for (String key : letterCountMap.keySet()) {
+                context.write(new Text(key), one);
+            }
+        }
     }
 
-    public static class CounterReducer extends Reducer<Text, LongWritable, NullWritable, LongWritable> 
+    public static class CounterReducer extends Reducer<Text, LongWritable, Text, LongWritable> 
     {
+        private LongWritable result = new LongWritable();
         @Override
-        public void reduce(Text key, Iterable<LongWritable> values, Reducer<Text, LongWritable, NullWritable, LongWritable>.Context context) throws IOException, InterruptedException {
+        public void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
             long sum = 0;
             for (LongWritable val : values) {
                 sum += val.get();

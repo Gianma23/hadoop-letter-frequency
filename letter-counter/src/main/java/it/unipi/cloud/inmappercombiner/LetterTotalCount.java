@@ -1,4 +1,4 @@
-package it.unipi.cloud.combiner;
+package it.unipi.cloud.inmappercombiner;
 
 import java.io.IOException;
 
@@ -11,18 +11,30 @@ public class LetterTotalCount {
 
     public static class CounterMapper extends Mapper<Object, Text, Text, LongWritable> 
     {
-        private final static LongWritable one = new LongWritable(1);
+        private final static LongWritable sum = new LongWritable();
         private final static Text word = new Text("total");
 
         @Override
+        public void setup(Context context) {
+            sum.set(0);
+        }
+
+        @Override
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            String line = value.toString();
-            for (char c : line.toCharArray()) {
-                if (Character.isLetter(c)) {
-                    context.write(word, one);
+        String line = value.toString();
+        long count = 0;
+        for (char c : line.toCharArray()) {
+            if (Character.isLetter(c)) {
+                    count++;
                 }
             }
-        }    
+            sum.set(count);
+        }
+
+        @Override
+        public void cleanup(Context context) throws IOException, InterruptedException {
+            context.write(word, sum);
+        }
     }
 
     public static class CounterReducer extends Reducer<Text, LongWritable, Text, LongWritable> 

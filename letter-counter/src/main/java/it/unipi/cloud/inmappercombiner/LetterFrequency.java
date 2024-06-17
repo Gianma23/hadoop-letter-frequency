@@ -1,4 +1,4 @@
-package it.unipi.cloud.inmappingcombiner;
+package it.unipi.cloud.inmappercombiner;
 
 import java.io.IOException;
 
@@ -52,7 +52,7 @@ public class LetterFrequency {
         private long letterCount;
 
         public void setup(Context context) {
-            this.letterCount = context.getConfiguration().getLong("letterCount", 1);
+            letterCount = context.getConfiguration().getLong("letterCount", 1);
         }
 
         @Override
@@ -64,8 +64,8 @@ public class LetterFrequency {
             }
             
             double freq = (double) sum / (double) letterCount;
-            this.result.set(freq);
-            context.write(key, this.result);
+            result.set(freq);
+            context.write(key, result);
         }
     }
 }

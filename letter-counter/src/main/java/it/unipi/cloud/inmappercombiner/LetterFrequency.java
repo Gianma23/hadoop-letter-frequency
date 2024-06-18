@@ -1,7 +1,6 @@
 package it.unipi.cloud.inmappercombiner;
 
 import java.io.IOException;
-import java.text.Normalizer;
 
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -12,14 +11,14 @@ import it.unipi.cloud.utils.StringUtils;
 
 import org.apache.hadoop.io.Text;
 import java.util.HashMap;
-import java.util.Map;
 
 public class LetterFrequency {
     public static class CounterMapper extends Mapper<LongWritable, Text, Text, LongWritable> 
     {
         private LongWritable one = new LongWritable(1);
-        Map<Text, LongWritable> letterCount;
+        HashMap<Text, LongWritable> letterCount;
 
+        @Override
         public void setup(Context context) {
             letterCount = new HashMap<Text, LongWritable>();
         }
@@ -27,10 +26,11 @@ public class LetterFrequency {
         @Override
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
         {
-            Text letter = new Text();
-            LongWritable newValue = new LongWritable();
             String line = StringUtils.normalizeString(value.toString());
             for (char c : line.toCharArray()) {
+                Text letter = new Text();
+                LongWritable newValue = new LongWritable();
+            
                 String letterStr = Character.toString(Character.toLowerCase(c));
                 if (!StringUtils.isLetter(letterStr)) {
                     continue;
@@ -45,8 +45,9 @@ public class LetterFrequency {
             }
         }
 
+        @Override
         public void cleanup(Context context) throws IOException, InterruptedException {
-            for (Map.Entry<Text, LongWritable> entry : letterCount.entrySet()) {
+            for (HashMap.Entry<Text, LongWritable> entry : letterCount.entrySet()) {
                 context.write(entry.getKey(), entry.getValue());
             }
         }
@@ -56,6 +57,7 @@ public class LetterFrequency {
     {
         private long letterCount;
 
+        @Override
         public void setup(Context context) {
             letterCount = context.getConfiguration().getLong("letterCount", 1);
         }

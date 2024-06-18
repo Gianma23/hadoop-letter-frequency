@@ -48,6 +48,7 @@ public class LetterFrequency {
     {
         private long letterCount;
 
+        @Override
         public void setup(Context context) {
             letterCount = context.getConfiguration().getLong("letterCount", 1);
         }

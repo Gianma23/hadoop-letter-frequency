@@ -28,7 +28,7 @@ public class LetterTotalCount {
                     count++;
                 }
             }
-            sum.set(count);
+            sum.set(sum.get() + count);
         }
 
         @Override

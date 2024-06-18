@@ -7,6 +7,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.io.Text;
+import it.unipi.cloud.utils.StringUtils;
 
 public class LetterFrequency {
     public static class CounterMapper extends Mapper<LongWritable, Text, Text, LongWritable> 
@@ -17,10 +18,11 @@ public class LetterFrequency {
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
         {
             Text letter = new Text();
-            String line = value.toString();
+            String line = StringUtils.normalizeString(value.toString());
             for (char c : line.toCharArray()) {
-                if (Character.isLetter(c)) {
-                    letter.set(Character.toString(Character.toLowerCase(c)));
+                String letterStr = Character.toString(Character.toLowerCase(c));
+                if (StringUtils.isLetter(letterStr)) {
+                    letter.set(letterStr);
                     context.write(letter, one);
                 }
             }

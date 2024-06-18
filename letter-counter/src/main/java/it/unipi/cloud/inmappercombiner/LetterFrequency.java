@@ -1,11 +1,15 @@
 package it.unipi.cloud.inmappercombiner;
 
 import java.io.IOException;
+import java.text.Normalizer;
 
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+
+import it.unipi.cloud.utils.StringUtils;
+
 import org.apache.hadoop.io.Text;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,16 +29,18 @@ public class LetterFrequency {
         {
             Text letter = new Text();
             LongWritable newValue = new LongWritable();
-            String line = value.toString();
+            String line = StringUtils.normalizeString(value.toString());
             for (char c : line.toCharArray()) {
-                if (Character.isLetter(c)) {
-                    letter.set(Character.toString(Character.toLowerCase(c)));
-                    if (letterCount.containsKey(letter)) {
-                        newValue.set(letterCount.get(letter).get() + 1);
-                        letterCount.put(letter, newValue);
-                    } else {
-                        letterCount.put(letter, one);
-                    }
+                String letterStr = Character.toString(Character.toLowerCase(c));
+                if (!StringUtils.isLetter(letterStr)) {
+                    continue;
+                }
+                letter.set(letterStr);
+                if (letterCount.containsKey(letter)) {
+                    newValue.set(letterCount.get(letter).get() + 1);
+                    letterCount.put(letter, newValue);
+                } else {
+                    letterCount.put(letter, one);
                 }
             }
         }

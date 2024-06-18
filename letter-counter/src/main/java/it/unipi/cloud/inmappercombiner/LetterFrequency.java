@@ -6,16 +6,19 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+
+import it.unipi.cloud.utils.StringUtils;
+
 import org.apache.hadoop.io.Text;
 import java.util.HashMap;
-import java.util.Map;
 
 public class LetterFrequency {
     public static class CounterMapper extends Mapper<LongWritable, Text, Text, LongWritable> 
     {
         private LongWritable one = new LongWritable(1);
-        Map<Text, LongWritable> letterCount;
+        HashMap<Text, LongWritable> letterCount;
 
+        @Override
         public void setup(Context context) {
             letterCount = new HashMap<Text, LongWritable>();
         }
@@ -23,24 +26,28 @@ public class LetterFrequency {
         @Override
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
         {
-            Text letter = new Text();
-            LongWritable newValue = new LongWritable();
-            String line = value.toString();
+            String line = StringUtils.normalizeString(value.toString());
             for (char c : line.toCharArray()) {
-                if (Character.isLetter(c)) {
-                    letter.set(Character.toString(Character.toLowerCase(c)));
-                    if (letterCount.containsKey(letter)) {
-                        newValue.set(letterCount.get(letter).get() + 1);
-                        letterCount.put(letter, newValue);
-                    } else {
-                        letterCount.put(letter, one);
-                    }
+                Text letter = new Text();
+                LongWritable newValue = new LongWritable();
+            
+                String letterStr = Character.toString(Character.toLowerCase(c));
+                if (!StringUtils.isLetter(letterStr)) {
+                    continue;
+                }
+                letter.set(letterStr);
+                if (letterCount.containsKey(letter)) {
+                    newValue.set(letterCount.get(letter).get() + 1);
+                    letterCount.put(letter, newValue);
+                } else {
+                    letterCount.put(letter, one);
                 }
             }
         }
 
+        @Override
         public void cleanup(Context context) throws IOException, InterruptedException {
-            for (Map.Entry<Text, LongWritable> entry : letterCount.entrySet()) {
+            for (HashMap.Entry<Text, LongWritable> entry : letterCount.entrySet()) {
                 context.write(entry.getKey(), entry.getValue());
             }
         }
@@ -50,6 +57,7 @@ public class LetterFrequency {
     {
         private long letterCount;
 
+        @Override
         public void setup(Context context) {
             letterCount = context.getConfiguration().getLong("letterCount", 1);
         }

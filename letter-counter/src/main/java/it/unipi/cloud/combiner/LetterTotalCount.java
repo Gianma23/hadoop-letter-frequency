@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import it.unipi.cloud.utils.StringUtils;
+
 import org.apache.hadoop.io.Text;
 
 public class LetterTotalCount {
@@ -16,11 +18,13 @@ public class LetterTotalCount {
 
         @Override
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            String line = value.toString();
+            String line = StringUtils.normalizeString(value.toString());
             for (char c : line.toCharArray()) {
-                if (Character.isLetter(c)) {
-                    context.write(word, one);
+                String letterStr = Character.toString(Character.toLowerCase(c));
+                if (StringUtils.isLetter(letterStr)) {
+                        context.write(word, one);
                 }
+                    
             }
         }    
     }

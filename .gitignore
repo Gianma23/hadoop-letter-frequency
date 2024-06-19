@@ -10,3 +10,6 @@
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+resources/performance_analysis/input/1GB.txt
+resources/performance_analysis/input/100MB.txt

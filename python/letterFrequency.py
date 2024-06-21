@@ -204,6 +204,9 @@ ax.legend()
 all_values = gc_times + memory_usages + execution_times
 ax.set_ylim([min(all_values) * 0.9, max(all_values) * 1.1]) 
 
+# Set y-axis to logarithmic scale
+ax.set_yscale('log')
+
 fig.tight_layout()
 
 plt.show()

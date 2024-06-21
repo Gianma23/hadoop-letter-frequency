@@ -1,0 +1,16 @@
+GC time elapsed for 1 GB file: 31.25452995300293 ms
+Maximum memory usage for 1 GB file: 57.41015625 MB
+Execution time for 1 GB file: 0.23999834060668945 seconds
+
+GC time elapsed for 100 MB file: 31.257152557373047 ms
+Maximum memory usage for 100 MB file: 57.41015625 MB
+Execution time for 100 MB file: 0.24845600128173828 seconds
+
+GC time elapsed for 1 MB file: 28.848648071289062 ms
+Maximum memory usage for 1 MB file: 60.46875 MB
+Execution time for 1 MB file: 0.5480489730834961 seconds
+
+GC time elapsed for 10 KB file: 29.671192169189453 ms
+Maximum memory usage for 10 KB file: 60.46875 MB
+Execution time for 10 KB file: 0.2491464614868164 seconds
+

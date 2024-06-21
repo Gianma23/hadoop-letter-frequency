@@ -29,40 +29,36 @@ run_id = 1 # DEFINED RUN ID HARD CODED
 method = 1 #SAME
 
 # Usage for 1 GB file
-process1 = psutil.Process()
-start_time1 = time.time()
-gc_start_time1 = start_time1
-gc.collect()
-gc_end_time1 = time.time()
-mem_usage_start1 = memory_usage()[0]
-calculate_letter_frequency('resources/performance_analysis/input/1GB.txt')
-mem_usage_end1 = memory_usage()[0]
-max_memory_usage1 = process1.memory_info().peak_wset / (1024 ** 2)  # Convert to MB
-timeExpired1 = time.time() - start_time1
-# print(f"Memory usage at start: {mem_usage_start1} MB")
-# print(f"Memory usage at end: {mem_usage_end1} MB")
-gc_time_elapsed1 = (gc_end_time1 - gc_start_time1) * 1000
-print(f"GC time elapsed: {gc_time_elapsed1} ms")
-print(f"Maximum memory usage: {max_memory_usage1} MB")
-print(f"Execution time: {timeExpired1} seconds")
+# process1 = psutil.Process()
+# start_time1 = time.time()
+# gc_start_time1 = start_time1
+# gc.collect()
+# gc_end_time1 = time.time()
+# mem_usage_start1 = memory_usage()[0]
+# calculate_letter_frequency('resources/performance_analysis/input/1GB.txt')
+# mem_usage_end1 = memory_usage()[0]
+# max_memory_usage1 = process1.memory_info().peak_wset / (1024 ** 2)  # Convert to MB
+# timeExpired1 = time.time() - start_time1
+# gc_time_elapsed1 = (gc_end_time1 - gc_start_time1) * 1000
+# print(f"GC time elapsed: {gc_time_elapsed1} ms")
+# print(f"Maximum memory usage: {max_memory_usage1} MB")
+# print(f"Execution time: {timeExpired1} seconds")
 
-# Usage for 100 MB file
-process2 = psutil.Process()
-start_time2 = time.time()
-gc_start_time2 = start_time2
-gc.collect()
-gc_end_time2 = time.time()
-mem_usage_start2 = memory_usage()[0]
-calculate_letter_frequency('resources/performance_analysis/input/100MB.txt')
-mem_usage_end2 = memory_usage()[0]
-max_memory_usage2 = process2.memory_info().peak_wset / (1024 ** 2)  # Convert to MB
-timeExpired2 = time.time() - start_time2
-# print(f"Memory usage at start: {mem_usage_start2} MB")
-# print(f"Memory usage at end: {mem_usage_end2} MB")
-gc_time_elapsed2 = (gc_end_time2 - gc_start_time2) * 1000
-print(f"GC time elapsed: {gc_time_elapsed2} ms")
-print(f"Maximum memory usage: {max_memory_usage2} MB")
-print(f"Execution time: {timeExpired2} seconds")
+# # Usage for 100 MB file
+# process2 = psutil.Process()
+# start_time2 = time.time()
+# gc_start_time2 = start_time2
+# gc.collect()
+# gc_end_time2 = time.time()
+# mem_usage_start2 = memory_usage()[0]
+# calculate_letter_frequency('resources/performance_analysis/input/100MB.txt')
+# mem_usage_end2 = memory_usage()[0]
+# max_memory_usage2 = process2.memory_info().peak_wset / (1024 ** 2)  # Convert to MB
+# timeExpired2 = time.time() - start_time2
+# gc_time_elapsed2 = (gc_end_time2 - gc_start_time2) * 1000
+# print(f"GC time elapsed: {gc_time_elapsed2} ms")
+# print(f"Maximum memory usage: {max_memory_usage2} MB")
+# print(f"Execution time: {timeExpired2} seconds")
 
 # Usage for 1 MB file
 process3 = psutil.Process()
@@ -75,8 +71,6 @@ calculate_letter_frequency('resources/performance_analysis/input/1MB.txt')
 mem_usage_end3 = memory_usage()[0]
 max_memory_usage3 = process3.memory_info().peak_wset / (1024 ** 2)  # Convert to MB
 timeExpired3 = time.time() - start_time3
-# print(f"Memory usage at start: {mem_usage_start3} MB")
-# print(f"Memory usage at end: {mem_usage_end3} MB")
 gc_time_elapsed3 = (gc_end_time3 - gc_start_time3) * 1000
 print(f"GC time elapsed: {gc_time_elapsed3} ms")
 print(f"Maximum memory usage: {max_memory_usage3} MB")
@@ -93,8 +87,6 @@ calculate_letter_frequency('resources/performance_analysis/input/10KB.txt')
 mem_usage_end4 = memory_usage()[0]
 max_memory_usage4 = process4.memory_info().peak_wset / (1024 ** 2)  # Convert to MB
 timeExpired4 = time.time() - start_time4
-# print(f"Memory usage at start: {mem_usage_start4} MB")
-# print(f"Memory usage at end: {mem_usage_end4} MB")
 gc_time_elapsed4 = (gc_end_time4 - gc_start_time4) * 1000
 print(f"GC time elapsed: {gc_time_elapsed4} ms")
 print(f"Maximum memory usage: {max_memory_usage4} MB")
@@ -132,163 +124,53 @@ gc_times = []
 memory_usages = []
 execution_times = []
 
-# ++++++++++++ SEARCHING BEST VALUE FOR 1GB ++++++++++++
+# GARBACE COLLECTOR
+# ++++++++++++ SEARCHING BEST VALUEs ++++++++++++
 map_gc_times = []
-with open('resources/performance_analysis/output_1_combiner_1/1GB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[0] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_combiner_2/1GB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[1] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_combiner_3/1GB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[2] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_inmappercombiner_1/1GB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[3] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_inmappercombiner_2/1GB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[4] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_inmappercombiner_3/1GB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[5] = line.split('=')[1].strip()
-gc_times[0] = min(map_gc_times)
-
-
-# ++++++++++++ SEARCHING BEST VALUE FOR 100MB ++++++++++++
-with open('resources/performance_analysis/output_1_combiner_1/100MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[0] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_combiner_2/100MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[1] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_combiner_3/100MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[2] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_inmappercombiner_1/100MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[3] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_inmappercombiner_2/100MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[4] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_inmappercombiner_3/100MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[5] = line.split('=')[1].strip()
-gc_times[1] = min(map_gc_times)
-
-
-# ++++++++++++ SEARCHING BEST VALUE FOR 1MB ++++++++++++
-with open('resources/performance_analysis/output_1_combiner_1/1MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[0] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_combiner_2/1MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[1] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_combiner_3/1MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[2] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_inmappercombiner_1/1MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[3] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_inmappercombiner_2/1MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[4] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_inmappercombiner_3/1MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[5] = line.split('=')[1].strip()
-gc_times[2] = min(map_gc_times)
-
-# ++++++++++++ SEARCHING BEST VALUE FOR 10KB ++++++++++++
-with open('resources/performance_analysis/output_1_combiner_1/1MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[0] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_combiner_2/1MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[1] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_combiner_3/1MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[2] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_inmappercombiner_1/1MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[3] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_inmappercombiner_2/1MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[4] = line.split('=')[1].strip()
-
-with open('resources/performance_analysis/output_1_inmappercombiner_3/1MB/log.txt', 'r') as file:
-    for line in file:
-            if 'GC time elapsed (ms)' in line:
-                # Split the line on the '=' sign and get the value, strip any whitespace
-                map_gc_times[5] = line.split('=')[1].strip()
-gc_times[3] = min(map_gc_times)
-
 map_memory_usages = []  
-map_execution_times = []  
+map_cpu_times = []  
+
+parameters_list = [
+    "CPU time spent (ms)", 
+    "GC time elapsed (ms)",
+    "Peak Map Virtual memory (bytes)",
+    "Execution time (s)" 
+    ]
+methods = ['combiner', 'inmappercombiner']
+dim = ['10KB', '1MB', '100MB', '1GB']
+n_reducers = 3
+
+# in map vectors for each file size
+for method in methods:
+    for i in range(1, n_reducers+1):
+        for dim_directory in os.listdir(f'../resources/performance_analysis/output_{run_id}_{method}_{i}'):
+            log_file = f'../resources/performance_analysis/output_{run_id}_{method}_{i}/{dim_directory}/log.txt'
+            with open(log_file, 'r') as f:
+                for line in f:
+                    if parameters_list[0] in line:
+                        map_cpu_times[i-1] = line.split("=")[1].strip()
+                    elif parameters_list[1] in line:
+                        map_gc_times[i-1] = line.split("=")[1].strip()
+                    elif parameters_list[2] in line:
+                        map_memory_usages[i-1] = line.split("=")[1].strip()
+
+            if dim_directory == '1GB':
+                gc_times[0] = min(map_gc_times)
+                memory_usages[0] = min(map_memory_usages)
+                execution_times[0] = min(map_cpu_times)
+            elif dim_directory == '100MB':
+                gc_times[1] = min(map_gc_times)
+                memory_usages[1] = min(map_memory_usages)
+                execution_times[1] = min(map_cpu_times)
+            elif dim_directory == '1MB':
+                gc_times[2] = min(map_gc_times)
+                memory_usages[2] = min(map_memory_usages)
+                execution_times[2] = min(map_cpu_times)
+            elif dim_directory == '10KB':
+                gc_times[3] = min(map_gc_times)
+                memory_usages[3] = min(map_memory_usages)
+                execution_times[3] = min(map_cpu_times)
+
 
 
 # Plotting the bar chart

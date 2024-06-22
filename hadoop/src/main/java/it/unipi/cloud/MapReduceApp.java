@@ -28,7 +28,6 @@ public class MapReduceApp {
     private static final int NUMBER_OF_REDUCERS_INDEX = 3;
     private static final int METHOD_INDEX = 4;
 
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
@@ -86,6 +85,7 @@ public class MapReduceApp {
         return letterCount;
     }
 
+    @SuppressWarnings("unchecked")
     private static Job getTotalLetterCountJob(Configuration conf, String inputhPath, String outputLetterCountPath, String method) throws Exception {
         Job countJob = Job.getInstance(conf, "Total Letter Count");
         countJob.setJarByClass(Class.forName(method + ".LetterTotalCount"));
@@ -102,6 +102,7 @@ public class MapReduceApp {
         return countJob;
     }
 
+    @SuppressWarnings("unchecked")
     private static Job getLetterFrequencyJob(Configuration conf, String inputhPath, String outputLetterFreqPath, String method, int nReducers) throws Exception {
         Job freqJob = Job.getInstance(conf, "Letter Frequency");        
         freqJob.setJarByClass(Class.forName(method + ".LetterFrequency"));

@@ -7,10 +7,6 @@ import os
 import psutil
 import gc
 
-#GC FATTO
-# - PRENDI IL RUN ID PER CREARE I PATH DINAMICI
-# CERCA ANCORA IL TEMPO DI UTILIZZO DELLA CPU E 
-
 
 def calculate_letter_frequency(file_path):
 
@@ -40,9 +36,6 @@ mem_usage_end1 = memory_usage()[0]
 max_memory_usage1 = process1.memory_info().peak_wset / (1024 ** 2)  # Convert to MB
 timeExpired1 = time.time() - start_time1
 gc_time_elapsed1 = (gc_end_time1 - gc_start_time1) * 1000
-# print(f"GC time elapsed: {gc_time_elapsed1} ms")
-# print(f"Maximum memory usage: {max_memory_usage1} MB")
-# print(f"Execution time: {timeExpired1} seconds")
 
 # # Usage for 100 MB file
 process2 = psutil.Process()
@@ -56,9 +49,6 @@ mem_usage_end2 = memory_usage()[0]
 max_memory_usage2 = process2.memory_info().peak_wset / (1024 ** 2)  # Convert to MB
 timeExpired2 = time.time() - start_time2
 gc_time_elapsed2 = (gc_end_time2 - gc_start_time2) * 1000
-# print(f"GC time elapsed: {gc_time_elapsed2} ms")
-# print(f"Maximum memory usage: {max_memory_usage2} MB")
-# print(f"Execution time: {timeExpired2} seconds")
 
 # Usage for 1 MB file
 process3 = psutil.Process()
@@ -72,9 +62,6 @@ mem_usage_end3 = memory_usage()[0]
 max_memory_usage3 = process3.memory_info().peak_wset / (1024 ** 2)  # Convert to MB
 timeExpired3 = time.time() - start_time3
 gc_time_elapsed3 = (gc_end_time3 - gc_start_time3) * 1000
-# print(f"GC time elapsed: {gc_time_elapsed3} ms")
-# print(f"Maximum memory usage: {max_memory_usage3} MB")
-# print(f"Execution time: {timeExpired3} seconds")
 
 # Usage for 10 KB file
 process4 = psutil.Process()
@@ -88,9 +75,6 @@ mem_usage_end4 = memory_usage()[0]
 max_memory_usage4 = process4.memory_info().peak_wset / (1024 ** 2)  # Convert to MB
 timeExpired4 = time.time() - start_time4
 gc_time_elapsed4 = (gc_end_time4 - gc_start_time4) * 1000
-# print(f"GC time elapsed: {gc_time_elapsed4} ms")
-# print(f"Maximum memory usage: {max_memory_usage4} MB")
-# print(f"Execution time: {timeExpired4} seconds")
 
 
 # Usage for 1 GB file
@@ -119,7 +103,6 @@ with open('resources/performance_analysis/output_python/pyPerformances.txt', 'a'
 
 print("performance analysis done, written to pyPerformances.txt")
 
-# Values for the map reducer analysis, 1GB -> 100MB -> 1MB -> 10KB 
 file_sizes = ['1 GB', '100 MB', '1 MB', '10 KB']
 gc_times = [0,0,0,0]
 memory_usages = [0,0,0,0]
@@ -225,22 +208,6 @@ for method in methods:
         inMapperArrayCPU.append(min(map_cpu_times100MB))
         inMapperArrayCPU.append(min(map_cpu_times1MB))
         inMapperArrayCPU.append(min(map_cpu_times10KB))
-        
-
-            # print("values of map_cpu_times1GB", map_cpu_times1GB)
-            # print("values of map_cpu_times100MB", map_cpu_times100MB)
-            # print("values of map_cpu_times1MB", map_cpu_times1MB)
-            # print("values of map_cpu_times100KB", map_cpu_times10KB)
-
-            # print("values of map_gc_times1GB", map_gc_times1GB)
-            # print("values of map_gc_times100MB", map_gc_times100MB)
-            # print("values of map_gc_times1MB", map_gc_times1MB)
-            # print("values of map_gc_times100KB", map_gc_times10KB)
-
-            # print("values of map_memory_usages1GB", map_memory_usages1GB)
-            # print("values of map_memory_usages100MB", map_memory_usages100MB)
-            # print("values of map_memory_usages1MB", map_memory_usages1MB)
-            # print("values of map_memory_usages100KB", map_memory_usages10KB)
 
 gc_times[0] = min(map_gc_times1GB)
 memory_usages[0] = min(map_memory_usages1GB)

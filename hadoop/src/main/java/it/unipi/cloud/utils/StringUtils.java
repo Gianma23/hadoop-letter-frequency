@@ -9,13 +9,12 @@ public class StringUtils {
     static Pattern pattern = Pattern.compile("^[A-Za-z]+$");
 
     private StringUtils() {
-        throw new IllegalStateException("Utility class");
+        throw new IllegalStateException("Static utility class cannot be instantiated");
     }
 
     static public String normalizeString(String text) {
         text = Normalizer.normalize(text, Normalizer.Form.NFD);
-        text = text.replaceAll("\\p{M}", "");
-        return text;
+        return text.replaceAll("\\p{M}", "");
     }
 
     static public boolean isLetter(String text) {

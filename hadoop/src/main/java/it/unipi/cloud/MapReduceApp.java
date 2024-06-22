@@ -29,7 +29,7 @@ public class MapReduceApp {
     private static final int METHOD_INDEX = 4;
 
     @SuppressWarnings("unchecked")
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 
@@ -37,6 +37,7 @@ public class MapReduceApp {
             System.err.println("Usage: letterfrequency <input> <letterTotalCountOutput> <letterFrequencyOutput> <nReducers> <method>");
             System.exit(2);
         }
+        // retrieve arguments
         String inputhPath = otherArgs[INPUT_INDEX];
         String outputLetterCountPath = otherArgs[OUTPUT_LETTERCOUNT_INDEX]; 
         String outputLetterFreqPath = otherArgs[OUTPUT_LETTERFREQ_INDEX];
@@ -44,46 +45,15 @@ public class MapReduceApp {
         String method = "it.unipi.cloud." + otherArgs[METHOD_INDEX];
 
         // Start the job to count the total number of letters
-        Job countJob = Job.getInstance(conf, "Total Letter Count");
-        countJob.setJarByClass(Class.forName(method + ".LetterTotalCount"));
-        countJob.setMapperClass((Class<Mapper>) Class.forName(method + ".LetterTotalCount$CounterMapper"));
-        countJob.setReducerClass((Class<Reducer>) Class.forName(method + ".LetterTotalCount$CounterReducer"));
-        if(method.equals("it.unipi.cloud.combiner")) {
-            countJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterTotalCount$CounterReducer"));
-        }
-        countJob.setOutputKeyClass(Text.class);
-        countJob.setOutputValueClass(LongWritable.class);
-
-        FileInputFormat.addInputPath(countJob, new Path(inputhPath));
-        FileOutputFormat.setOutputPath(countJob, new Path(outputLetterCountPath));
-
+        Job countJob = getTotalLetterCountJob(conf, inputhPath, outputLetterCountPath, method);
         if(!countJob.waitForCompletion(true)){
             System.exit(1);
         }
-
-        // Start the job to calculate the frequency of each letter
-        Job freqJob = Job.getInstance(conf, "Letter Frequency");
         
+        // Start the job to calculate the frequency of each letter
+        Job freqJob = getLetterFrequencyJob(conf, inputhPath, outputLetterFreqPath, method, nReducers);
         long letterCount = getLetterCount(conf, outputLetterCountPath);
         freqJob.getConfiguration().setLong("letterCount", letterCount);
-        
-        freqJob.setJarByClass(Class.forName(method + ".LetterFrequency"));
-        freqJob.setMapperClass((Class<Mapper>) Class.forName(method + ".LetterFrequency$CounterMapper"));
-        freqJob.setReducerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency$CounterReducer"));
-        if(method.equals("it.unipi.cloud.combiner")) {
-            freqJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency$CounterCombiner"));
-        }
-
-        freqJob.setNumReduceTasks(nReducers);
-
-        freqJob.setMapOutputKeyClass(Text.class);
-        freqJob.setMapOutputValueClass(LongWritable.class);
-        freqJob.setOutputKeyClass(Text.class);
-        freqJob.setOutputValueClass(DoubleWritable.class);
-
-        FileInputFormat.addInputPath(freqJob, new Path(inputhPath));
-        FileOutputFormat.setOutputPath(freqJob, new Path(outputLetterFreqPath));
-
         System.exit(freqJob.waitForCompletion(true) ? 0 : 1);
     }
 
@@ -100,19 +70,55 @@ public class MapReduceApp {
             if (fileName.equals("_SUCCESS")) {
                 continue;
             }
-            // Open the file
-            FSDataInputStream inputStream = fs.open(fileStatus.getPath());
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             
-            String firstLine = bufferedReader.readLine();
-            if (firstLine != null) {
-                firstLine = firstLine.split("\t")[1];
-                letterCount += Long.parseLong(firstLine);                    
+            try (FSDataInputStream inputStream = fs.open(fileStatus.getPath());
+                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
+            
+                String firstLine = bufferedReader.readLine();
+                if (firstLine != null) {
+                    firstLine = firstLine.split("\t")[1];
+                    letterCount += Long.parseLong(firstLine);                    
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            // Close the input stream
-            bufferedReader.close();
-            inputStream.close();
         }
         return letterCount;
+    }
+
+    private static Job getTotalLetterCountJob(Configuration conf, String inputhPath, String outputLetterCountPath, String method) throws Exception {
+        Job countJob = Job.getInstance(conf, "Total Letter Count");
+        countJob.setJarByClass(Class.forName(method + ".LetterTotalCount"));
+        countJob.setMapperClass((Class<Mapper>) Class.forName(method + ".LetterTotalCount$CounterMapper"));
+        countJob.setReducerClass((Class<Reducer>) Class.forName(method + ".LetterTotalCount$CounterReducer"));
+        if(method.equals("it.unipi.cloud.combiner")) {
+            countJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterTotalCount$CounterReducer"));
+        }
+        countJob.setOutputKeyClass(Text.class);
+        countJob.setOutputValueClass(LongWritable.class);
+
+        FileInputFormat.addInputPath(countJob, new Path(inputhPath));
+        FileOutputFormat.setOutputPath(countJob, new Path(outputLetterCountPath));
+        return countJob;
+    }
+
+    private static Job getLetterFrequencyJob(Configuration conf, String inputhPath, String outputLetterFreqPath, String method, int nReducers) throws Exception {
+        Job freqJob = Job.getInstance(conf, "Letter Frequency");        
+        freqJob.setJarByClass(Class.forName(method + ".LetterFrequency"));
+        freqJob.setMapperClass((Class<Mapper>) Class.forName(method + ".LetterFrequency$CounterMapper"));
+        freqJob.setReducerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency$CounterReducer"));
+        if(method.equals("it.unipi.cloud.combiner")) {
+            freqJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency$CounterCombiner"));
+        }
+
+        freqJob.setNumReduceTasks(nReducers);
+
+        freqJob.setMapOutputValueClass(LongWritable.class);
+        freqJob.setOutputKeyClass(Text.class);
+        freqJob.setOutputValueClass(DoubleWritable.class);
+
+        FileInputFormat.addInputPath(freqJob, new Path(inputhPath));
+        FileOutputFormat.setOutputPath(freqJob, new Path(outputLetterFreqPath));
+        return freqJob;
     }
 }

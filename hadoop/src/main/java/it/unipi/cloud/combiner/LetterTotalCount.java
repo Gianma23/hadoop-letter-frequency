@@ -23,8 +23,7 @@ public class LetterTotalCount {
                 String letterStr = Character.toString(Character.toLowerCase(c));
                 if (StringUtils.isLetter(letterStr)) {
                         context.write(word, one);
-                }
-                    
+                }        
             }
         }    
     }

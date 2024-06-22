@@ -1,18 +1,15 @@
 package it.unipi.cloud.combiner;
 
 import java.io.IOException;
-
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import it.unipi.cloud.utils.StringUtils;
-
 import org.apache.hadoop.io.Text;
 
 public class LetterTotalCount {
 
-    public static class CounterMapper extends Mapper<Object, Text, Text, LongWritable> 
-    {
+    public static class CounterMapper extends Mapper<Object, Text, Text, LongWritable> {
         private final static LongWritable one = new LongWritable(1);
         private final static Text word = new Text("total");
 
@@ -23,13 +20,12 @@ public class LetterTotalCount {
                 String letterStr = Character.toString(Character.toLowerCase(c));
                 if (StringUtils.isLetter(letterStr)) {
                         context.write(word, one);
-                }        
+                }
             }
         }    
     }
 
-    public static class CounterReducer extends Reducer<Text, LongWritable, Text, LongWritable> 
-    {
+    public static class CounterReducer extends Reducer<Text, LongWritable, Text, LongWritable> {
         @Override
         public void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
             LongWritable result = new LongWritable();
@@ -40,5 +36,5 @@ public class LetterTotalCount {
             result.set(sum);
             context.write(key, result);
         }
-    }   
+    }
 }

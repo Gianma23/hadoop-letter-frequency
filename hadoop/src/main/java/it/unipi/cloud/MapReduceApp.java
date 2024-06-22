@@ -105,10 +105,10 @@ public class MapReduceApp {
     private static Job getLetterFrequencyJob(Configuration conf, String inputhPath, String outputLetterFreqPath, String method, int nReducers) throws Exception {
         Job freqJob = Job.getInstance(conf, "Letter Frequency");        
         freqJob.setJarByClass(Class.forName(method + ".LetterFrequency"));
-        freqJob.setMapperClass((Class<Mapper>) Class.forName(method + ".LetterFrequency$CounterMapper"));
-        freqJob.setReducerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency$CounterReducer"));
+        freqJob.setMapperClass((Class<Mapper>) Class.forName(method + ".LetterFrequency$FrequencyMapper"));
+        freqJob.setReducerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency$FrequencyReducer"));
         if(method.equals("it.unipi.cloud.combiner")) {
-            freqJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency$CounterCombiner"));
+            freqJob.setCombinerClass((Class<Reducer>) Class.forName(method + ".LetterFrequency$FrequencyCombiner"));
         }
 
         freqJob.setNumReduceTasks(nReducers);
